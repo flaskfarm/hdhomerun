@@ -59,9 +59,9 @@
 
 #### Plex 연결
   - Plex DVR 설정에서 HDHomerun 기기를 기본적으로 인식하나 주파수 범위가 한국상황에 맞지 않음.   
-   <img src="https://i.imgur.com/XBA9FrY.png" width="50%" height="50%" />   
-   왼쪽이 기본인식, 가운데가 Plex Proxy 등록 후 인식.   
-   설정 - API 에 있는 Proxy주소와 XMLTV 주소 사용.   
-   트랜스 코딩은 Plex Server 에서 실행.   
-   <img src="https://i.imgur.com/1tAlBUi.png" width="50%" height="50%" />
+  - 왼쪽이 기본인식, 가운데가 Plex Proxy 등록 후 인식.   
+    <img src="https://i.imgur.com/XBA9FrY.png" width="50%" height="50%" />   
+  - 설정 - API 에 있는 Proxy주소와 XMLTV 주소 사용.   
+  - 트랜스 코딩은 Plex Server 에서 실행.   
+    <img src="https://i.imgur.com/1tAlBUi.png" width="50%" height="50%" />
 
