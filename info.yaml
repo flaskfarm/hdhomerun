@@ -1,5 +1,5 @@
 title: "HDHomerun"
-version: "1.0.0"
+version: "1.0.1"
 package_name: "hdhomerun"
 developer: "flaskfarm"
 description: "HDHomerun 도구"

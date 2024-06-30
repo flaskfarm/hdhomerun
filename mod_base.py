@@ -166,25 +166,24 @@ class ModuleBase(PluginModuleBase):
             
             ffmpeg_command = SupportSubprocess.command_for_windows(ffmpeg_command)
             logger.debug(f'command : {ffmpeg_command}')
-            process = subprocess.Popen(ffmpeg_command, stdout = subprocess.PIPE, stderr = subprocess.STDOUT, bufsize = -1)
-
-            while True:
-                line = process.stdout.read(1024)
-                #print(line)
-                buffer.append(line)
-                if sentBurst is False and time.time() > startTime + 1 and len(buffer) > 0:
-                    sentBurst = True
-                    for i in range(0, len(buffer) - 2):
+            with subprocess.Popen(ffmpeg_command, stdout = subprocess.PIPE, stderr = subprocess.STDOUT, bufsize = -1) as process:
+                while True:
+                    line = process.stdout.read(1024)
+                    #print(line)
+                    buffer.append(line)
+                    if sentBurst is False and time.time() > startTime + 1 and len(buffer) > 0:
+                        sentBurst = True
+                        for i in range(0, len(buffer) - 2):
+                            yield buffer.pop(0)
+                    elif time.time() > startTime + 1 and len(buffer) > 0:
                         yield buffer.pop(0)
-                elif time.time() > startTime + 1 and len(buffer) > 0:
-                    yield buffer.pop(0)
-                process.poll()
-                if isinstance(process.returncode, int):
-                    if process.returncode > 0:
-                        logger.debug('FFmpeg Error :%s', process.returncode)
-                    else:
-                        logger.debug('FFmpeg normal finish..')  
-                    break
+                    process.poll()
+                    if isinstance(process.returncode, int):
+                        if process.returncode > 0:
+                            logger.debug('FFmpeg Error :%s', process.returncode)
+                        else:
+                            logger.debug('FFmpeg normal finish..')  
+                        break
             #del process_list[process]
         return Response(stream_with_context(generate()), mimetype = "video/MP2T")  
 
