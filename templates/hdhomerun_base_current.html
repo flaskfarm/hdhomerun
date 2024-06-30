@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+{% block content %}
+  {{ macros.m_hr_head_top() }}
+  {{ macros.m_row_start('0') }}
+  {{ macros.m_col(1,  macros.m_strong('번호')) }}
+  {{ macros.m_col_wide(1,  macros.m_strong('그룹')) }}
+  {{ macros.m_col_wide(1,  macros.m_strong('이름(화면)')) }}
+  {{ macros.m_col_wide(3,  macros.m_strong('현재방송')) }}
+  {{ macros.m_col_wide(1,  macros.m_strong('LINK'), 'right') }}
+  {{ macros.m_col_wide(5,  macros.m_strong('Action'), 'center') }}
+  {{ macros.m_row_end() }}
+  {{ macros.m_hr_head_bottom() }}
+  <form id="custom_form" name="custom_form">
+  <div id="list_div"></div>
+  </form>
+
+<form name="playform">
+  <input type="hidden" id="play_title" name="play_title">
+  <input type="hidden" id="play_source_src"  name="play_source_src">
+  <input type="hidden" id="play_source_type"  name="play_source_type">
+</form>
+
+
+<script type="text/javascript">
+var ddns = "{{ arg['ddns'] }}";
+var apikey = "{{ arg['apikey'] }}";
+var user_link = "{{ arg['base_user_link'] }}";
+$(document).ready(function(){
+  load_db();
+});
+
+$("body").on('click', '#clipboard_copy_btn', function(e){
+  e.preventDefault();
+  var copyText = $(this).data('url')
+  var tempElem = document.createElement('textarea');
+  tempElem.value = copyText;
+  document.body.appendChild(tempElem);
+  tempElem.select();
+  document.execCommand("copy");
+  document.body.removeChild(tempElem);
+  $.notify('<strong>주소를 클립보드에 복사하였습니다.</strong>', {
+    type: 'success'
+  });
+});
+
+
+$("body").on('click', '#web_play_btn', function(e) {
+  e.preventDefault();
+  id = $(this).data('id');
+  name = $(this).data('name');
+  url = $(this).data('url');
+
+  video_id = "hdhomerun_"+name+"_"+id
+  url = ddns + "/hdhomerun/api/trans.ts?source=" + url;
+  if (true) {
+    url = url + '&apikey=' + apikey
+  } 
+
+  error_count = 0
+  //play_video(video_id, url, true)
+
+  var form = document.playform;
+  var popupWidth = 980;
+  var leftPos = screen.width - popupWidth;
+  var target = video_id;
+  window.open('', target, "location=no, directories=no,resizable=no,status=no,toolbar=no,menubar=no,width=" + popupWidth + ", height=560, top=100, left=" + leftPos);
+  
+  form.action = '/hdhomerun/video';
+  form.method = "post";
+  form.target = target;
+
+  $('#play_title').val(name);
+  $('#play_source_src').val(url);
+  $('#play_source_type').val('application/x-mpegURL');
+  form.submit();
+});
+
+$("body").on('click', '#program_btn', function(e){
+  e.preventDefault();
+  globalSendCommand('program', $(this).data('id'));
+});
+
+function load_db() {
+  globalSendCommand('load_db', null, null, null, function(data) {
+    current_data = data;
+    make_list();
+  });
+}
+
+
+function make_list() {
+  console.log(current_data)
+  str = '';
+  data = current_data.data
+  var current_view_mode = 'use';
+  for (i in data) {
+    if (current_view_mode == 'use') {
+      if (data[i].use == false) continue
+    } else if (current_view_mode == 'use_false') {
+      if (data[i].use) continue
+    } else if (current_view_mode == 'no_epg') {
+      if (data[i].use == false) continue
+      if (data[i].match_epg_name != '') continue
+    }
+    str += j_row_start(5);
+
+    str += j_col(1, String(data[i].ch_number).padStart(3, "0"), 'left');
+    str += j_col_wide(1, data[i].group_name, 'left');
+    str += j_col_wide(1, data[i].scan_name);
+    str += j_col_wide(3, (data[i].current_program ? data[i].current_program : ""));
+
+    tmp = "<a href=\"" + data[i].url + "\">URL</a>&nbsp;&nbsp;/&nbsp;&nbsp;";
+    tmp += "<a href=\"" + data[i].url_trans + "\">TRANS</a>&nbsp;&nbsp;/&nbsp;&nbsp;";
+    tmp2 = user_link.replace("{URL}", data[i].url).replace("{TRANS}", data[i].url_trans)
+    tmp += "<a href=\"" + tmp2 + "\">USER</a>";
+    str += j_col_wide(2, tmp, 'right');
+
+
+    tmp = ''
+    tmp += j_button_small('clipboard_copy_btn', 'URL 복사', {'url':data[i].url}, 'info');
+    tmp += j_button_small('clipboard_copy_btn', 'TRANS 복사', {'url':data[i].url_trans}, 'info');
+    tmp += j_button_small('web_play_btn', '웹 PLAY', {'index':i, 'url':data[i].url, 'name':data[i].scan_name}, 'info');
+    tmp += j_button_small('program_btn', 'PROGRAM', {'id':data[i].id}, 'info');
+    tmp = j_button_group(tmp)
+
+    str += j_col(4, tmp, 'right')
+    str += j_row_end();
+    if (i != data.length -1) str += j_hr(0);
+  }
+  document.getElementById("list_div").innerHTML = str;
+}
+</script>    
+{% endblock %}

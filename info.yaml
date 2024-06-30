@@ -1,0 +1,6 @@
+title: "HDHomerun"
+version: "1.0.0"
+package_name: "hdhomerun"
+developer: "flaskfarm"
+description: "HDHomerun 도구"
+home: "https://github.com/flaskfarm/hdhomerun"

@@ -1,0 +1,27 @@
+<html>
+  <head lang="ko">
+    <title>{{arg['play_title']}}</title>
+    <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
+    <script type="module" src="https://cdn.jsdelivr.net/npm/media-chrome@3/+esm"></script>
+    <script type="module">
+      import mpegtsVideoElement from 'https://cdn.jsdelivr.net/npm/mpegts-video-element@0.2.3/+esm'
+    </script>
+  </head>
+  <body style="background-color: black;">
+    <media-controller noautoseektolive defaultstreamtype="live">
+      <mpegts-video slot="media" autoplay muted src="{{arg['play_source_src']}}"></mpegts-video>
+      <media-loading-indicator slot="centered-chrome" noautohide></media-loading-indicator>
+      <media-control-bar>
+        <media-play-button></media-play-button>
+        <media-mute-button></media-mute-button>
+        <media-volume-range></media-volume-range>
+        <media-time-range></media-time-range>
+        <span class="spacer"></span>
+        <media-pip-button></media-pip-button>
+        <!--<media-captions-button></media-captions-button>-->
+        <media-live-button disabled></media-live-button>
+        <media-fullscreen-button></media-fullscreen-button>
+      </media-control-bar>
+    </media-controller>
+  </body>
+</html>
